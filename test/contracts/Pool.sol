@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.4;
+pragma solidity ^0.7.6;
 
 library AddressUpgradeable {
     function isContract(address account) internal view returns (bool) {
@@ -83,7 +83,7 @@ abstract contract Initializable {
      * @dev Indicates that the contract is in the process of being initialized.
      */
     bool private _initializing;
-    
+
     /**
      * @dev Modifier to protect an initializer function from being invoked twice.
      */
@@ -114,17 +114,16 @@ abstract contract ContextUpgradeable is Initializable {
         __Context_init_unchained();
     }
 
-    function __Context_init_unchained() internal initializer {}
-
+    function __Context_init_unchained() internal initializer {
+    }
     function _msgSender() internal view virtual returns (address payable) {
-        return payable(msg.sender);
+        return msg.sender;
     }
 
     function _msgData() internal view virtual returns (bytes memory) {
         this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
         return msg.data;
     }
-
     uint256[50] private __gap;
 }
 
@@ -242,11 +241,6 @@ interface IERC20 {
      */
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
-        
-    function decimals() external view returns (uint8);
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
-    
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
      * another (`to`).
@@ -261,6 +255,7 @@ interface IERC20 {
      */
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
+
 
 library SafeMath {
     /**
@@ -600,6 +595,8 @@ library SafeERC20 {
         }
     }
 }
+
+
 
 library EnumerableSet {
     
@@ -1089,144 +1086,40 @@ interface IUniswapV2Factory {
     function setFeeToSetter(address) external;
 }
 
+
 interface IPoolFactory {
-  function increaseTotalValueLocked(address currency, uint256 value) external;
-  function decreaseTotalValueLocked(address currency, uint256 value) external;
+  function increaseTotalValueLocked(uint256 value) external;
+  function decreaseTotalValueLocked(uint256 value) external;
   function removePoolForToken(address token, address pool) external;
   function recordContribution(address user, address pool) external;
-  function addTopPool(address poolAddress, address currency, uint256 raisedAmount) external;
-  function removeTopPool(address poolAddress) external;
- 
-  event TvlChanged(address currency, uint256 totalLocked, uint256 totalRaised);
+
+  event TvlChanged(uint256 totalLocked, uint256 totalRaised);
   event ContributionUpdated(uint256 totalParticipations);
   event PoolForTokenRemoved(address indexed token, address pool);
 }
 
+
 interface IPool {
     function initialize(
-        address[4] memory _addrs, // [0] = token, [1] = router, [2] = governance , [3] = Authority, [4] = currency
-        uint256 [16] memory _saleInfo, 
+        address[3] memory _addrs, // [0] = token, [1] = router, [2] = governance
+        uint256[2] memory _rateSettings, // [0] = rate, [1] = uniswap rate
+        uint256[2] memory _contributionSettings, // [0] = min, [1] = max
+        uint256[2] memory _capSettings, // [0] = soft cap, [1] = hard cap
+        uint256[3] memory _timeSettings, // [0] = start, [1] = end, [2] = unlock seconds
+        uint256[2] memory _feeSettings, // [0] = token fee percent, [1] = eth fee percent
+        bool _useWhitelisting,
+        uint256 _liquidityPercent,
+        uint256 _refundType,
         string memory _poolDetails,
-        address[3] memory _linkAddress, // [0] factory ,[1] = manager 
-        uint8 _version,
-        uint256 _contributeWithdrawFee,
-        string[3] memory _otherInfo
+        address _poolOwner,
+        address _poolManager
     ) external;
 
     function initializeVesting(
-         uint256[3] memory _vestingInit  
+         uint256[7] memory _vestingInit  
     ) external;
 
-    function setKycAudit(bool _kyc , bool _audit , string memory _kyclink,string memory _auditlink) external;
-    function emergencyWithdrawLiquidity(address token_, address to_, uint256 amount_) external;
-    function emergencyWithdraw(address payable to_, uint256 amount_) external;
-    function setGovernance(address governance_) external;
-    function emergencyWithdrawToken( address payaddress ,address tokenAddress, uint256 tokens ) external;
-    function getPoolInfo() external view returns (address, address, uint8[] memory , uint256[] memory , string memory , string memory , string memory);
-}
-
-library FullMath {
-  /// @notice Calculates floor(a×b÷denominator) with full precision. Throws if result overflows a uint256 or denominator == 0
-  /// @param a The multiplicand
-  /// @param b The multiplier
-  /// @param denominator The divisor
-  /// @return result The 256-bit result
-  /// @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
-  function mulDiv(
-    uint256 a,
-    uint256 b,
-    uint256 denominator
-  ) internal pure returns (uint256 result) {
-    // 512-bit multiply [prod1 prod0] = a * b
-    // Compute the product mod 2**256 and mod 2**256 - 1
-    // then use the Chinese Remainder Theorem to reconstruct
-    // the 512 bit result. The result is stored in two 256
-    // variables such that product = prod1 * 2**256 + prod0
-    uint256 prod0; // Least significant 256 bits of the product
-    uint256 prod1; // Most significant 256 bits of the product
-    assembly {
-      let mm := mulmod(a, b, not(0))
-      prod0 := mul(a, b)
-      prod1 := sub(sub(mm, prod0), lt(mm, prod0))
-    }
-
-    // Handle non-overflow cases, 256 by 256 division
-    if (prod1 == 0) {
-      require(denominator > 0);
-      assembly {
-        result := div(prod0, denominator)
-      }
-      return result;
-    }
-
-    // Make sure the result is less than 2**256.
-    // Also prevents denominator == 0
-    require(denominator > prod1);
-
-    ///////////////////////////////////////////////
-    // 512 by 256 division.
-    ///////////////////////////////////////////////
-
-    // Make division exact by subtracting the remainder from [prod1 prod0]
-    // Compute remainder using mulmod
-    uint256 remainder;
-    assembly {
-      remainder := mulmod(a, b, denominator)
-    }
-    // Subtract 256 bit number from 512 bit number
-    assembly {
-      prod1 := sub(prod1, gt(remainder, prod0))
-      prod0 := sub(prod0, remainder)
-    }
-
-    // Factor powers of two out of denominator
-    // Compute largest power of two divisor of denominator.
-    // Always >= 1.
-    unchecked {
-      uint256 twos = (type(uint256).max - denominator + 1) & denominator;
-      // Divide denominator by power of two
-      assembly {
-        denominator := div(denominator, twos)
-      }
-
-      // Divide [prod1 prod0] by the factors of two
-      assembly {
-        prod0 := div(prod0, twos)
-      }
-      // Shift in bits from prod1 into prod0. For this we need
-      // to flip `twos` such that it is 2**256 / twos.
-      // If twos is zero, then it becomes one
-      assembly {
-        twos := add(div(sub(0, twos), twos), 1)
-      }
-      prod0 |= prod1 * twos;
-
-      // Invert denominator mod 2**256
-      // Now that denominator is an odd number, it has an inverse
-      // modulo 2**256 such that denominator * inv = 1 mod 2**256.
-      // Compute the inverse by starting with a seed that is correct
-      // correct for four bits. That is, denominator * inv = 1 mod 2**4
-      uint256 inv = (3 * denominator) ^ 2;
-      // Now use Newton-Raphson iteration to improve the precision.
-      // Thanks to Hensel's lifting lemma, this also works in modular
-      // arithmetic, doubling the correct bits in each step.
-      inv *= 2 - denominator * inv; // inverse mod 2**8
-      inv *= 2 - denominator * inv; // inverse mod 2**16
-      inv *= 2 - denominator * inv; // inverse mod 2**32
-      inv *= 2 - denominator * inv; // inverse mod 2**64
-      inv *= 2 - denominator * inv; // inverse mod 2**128
-      inv *= 2 - denominator * inv; // inverse mod 2**256
-
-      // Because the division is now exact we can divide by multiplying
-      // with the modular inverse of denominator. This will give us the
-      // correct result modulo 2**256. Since the precoditions guarantee
-      // that the outcome is less than 2**256, this is the final result.
-      // We don't need to compute the high bits of the result and prod1
-      // is no longer required.
-      result = prod0 * inv;
-      return result;
-    }
-  }
+    function version() external view returns (uint8);
 }
 
 library PoolLibrary {
@@ -1277,7 +1170,7 @@ library PoolLibrary {
         }
         uint256 remainingAllocation = maxContribution.sub(contributed);
 
-        // How much eth is one token
+        // How much bnb is one token
         if (availableToBuy > remainingAllocation) {
             if (contributed > 0) {
                 return (0, remainingAllocation);
@@ -1304,38 +1197,22 @@ library PoolLibrary {
     return amount.mul(rate).div(1e18);
   }
 
-
   function addLiquidity(
     address router,
-    address currency,
     address token,
-    uint256 liquidityEth,
+    uint256 liquidityBnb,
     uint256 liquidityToken,
     address pool
   ) internal returns (uint256 liquidity) {
     IERC20(token).approve(router, liquidityToken);
-
-    if(currency == address(0)) {
-        (,, liquidity) = IUniswapV2Router02(router).addLiquidityETH{value: liquidityEth}(
-            token,
-            liquidityToken,
-            0,
-            0,
-            pool,
-            block.timestamp
-        );
-    } else {
-        (,, liquidity) = IUniswapV2Router02(router).addLiquidity(
-            token,
-            currency,
-            liquidityToken,
-            liquidityEth,
-            0,
-            0,
-            pool,
-            block.timestamp
-        );
-    }
+    (,, liquidity) = IUniswapV2Router02(router).addLiquidityETH{value: liquidityBnb}(
+        token,
+        liquidityToken,
+        liquidityToken,
+        liquidityBnb,
+        pool,
+        block.timestamp
+    );
   }
 
   function calculateFeeAndLiquidity(
@@ -1345,54 +1222,22 @@ library PoolLibrary {
     uint256 totalVolumePurchased,
     uint256 liquidityPercent,
     uint256 liquidityListingRate
-  ) internal pure returns (uint256 ethFee, uint256 tokenFee, uint256 liquidityEth, uint256 liquidityToken) {
-    ethFee = totalRaised.mul(ethFeePercent).div(100);
+  ) internal pure returns (uint256 bnbFee, uint256 tokenFee, uint256 liquidityBnb, uint256 liquidityToken) {
+    bnbFee = totalRaised.mul(ethFeePercent).div(100);
     tokenFee = totalVolumePurchased.mul(tokenFeePercent).div(100);
-    liquidityEth = totalRaised.sub(ethFee).mul(liquidityPercent).div(100);
-    liquidityToken = liquidityEth.mul(liquidityListingRate).div(1e18);
+    liquidityBnb = totalRaised.sub(bnbFee).mul(liquidityPercent).div(100);
+    liquidityToken = liquidityBnb.mul(liquidityListingRate).div(1e18);
   }
 }
 
-contract ReEntrancyGuard {
-    bool internal locked;
-
-    modifier noReentrant() {
-        require(!locked, "No re-entrancy");
-        locked = true;
-        _;
-        locked = false;
-    }
-}
-
-contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
+contract Pool is OwnableUpgradeable, IPool {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
     using Address for address payable;
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    uint8 public VERSION;
-    uint public MINIMUM_LOCK_DAYS;
-    uint256 public feesWithdraw;
-    
-
-    struct poolInfo{
-        address currency;
-        address token; 
-        uint256 startTime;
-        uint256  endTime;
-        uint256  totalRaised;
-        uint256 hardCap; 
-        uint256 softCap; 
-        uint8 poolState; 
-        uint8 poolType; 
-        uint256 minContribution; 
-        uint256 maxContribution;
-        uint256 rate;
-        uint256 liquidityListingRate;
-        uint256 liquidityPercent;
-        uint256 liquidityUnlockTime;
-    } 
-    
+    uint8 constant VERSION = 2;
+    uint constant MINIMUM_LOCK_DAYS = 5 minutes;
 
     enum PoolState {
         inUse,
@@ -1400,32 +1245,17 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
         cancelled
     }
 
-    enum PoolType {
-        presale,
-        privatesale,
-        fairsale
-    }
-
     address public factory;
     address public router;
     address public governance;
-    address payable private adminWallet;
     
-    address public currency;
+
     address public token;
     uint256 public rate;
     uint256 public minContribution;
     uint256 public maxContribution;
     uint256 public softCap;
     uint256 public hardCap;
-
-    bool public audit;
-    bool public kyc;
-    bool public auditStatus;
-    bool public kycStatus;
-    string public auditLink;
-    string public kycLink;
-    string public ownerMail;
 
     uint256 public startTime;
     uint256 public endTime;
@@ -1442,7 +1272,6 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
     string public poolDetails;
 
     PoolState public poolState;
-    PoolType public poolType;
 
     uint256 public totalRaised;
     uint256 public totalVolumePurchased;
@@ -1457,16 +1286,21 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
     mapping(address => uint256) public purchasedOf;
     mapping(address => uint256) public claimedOf;
     mapping(address => uint256) public refundedOf;
-    
-    uint256 public tgeDate; // TGE date for vesting locks, unlock date for normal locks
-    uint256 public tgeBps; // In bips. Is 0 for normal locks
-    uint256 public cycle; // Is 0 for normal locks
-    uint256 public cycleBps; // In bips. Is 0 for normal locks
+
+    uint256 public totalVestingTokens;
+    uint256 public tgeLockDuration;
+    uint256 public tgeTime;
+    uint256 public tgeTokensRelease;
+    uint256 public cycle;
+    uint256 public tokensReleaseEachCycle;
+
+    uint256 public totalVestedTokens;
+    uint256 public eachvestingPer;
+    uint256 public tgeTokenReleasePer;
 
     bool public useWhitelisting;
     EnumerableSet.AddressSet private whitelistedUsers;
     mapping(address => bool) private isWhitelisted;
-    
 
     event Contributed(
         address indexed user,
@@ -1490,7 +1324,8 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
 
     event LiquidityWithdrawn(uint256 amount, uint256 timestamp);
 
-    
+    event VestingTokenWithdrawn(uint256 amount, uint256 timestamp);
+
     modifier inProgress() {
         require(poolState == PoolState.inUse, "Pool is either completed or cancelled");
         require(block.timestamp >= startTime && block.timestamp < endTime, "It's not time to buy");
@@ -1516,88 +1351,81 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
     }
 
     receive() external payable {
-        if (msg.value > 0) contribute(0);
+        if (msg.value > 0) contribute();
     }
 
     function initialize(
-        address[4] memory _addrs, // [0] = token, [1] = router, [2] = governance , [3] = currency
-        uint256[16] memory _saleInfo, 
+        address[3] memory _addrs, // [0] = token, [1] = router, [2] = governance
+        uint256[2] memory _rateSettings, // [0] = rate, [1] = uniswap rate
+        uint256[2] memory _contributionSettings, // [0] = min, [1] = max
+        uint256[2] memory _capSettings, // [0] = soft cap, [1] = hard cap
+        uint256[3] memory _timeSettings, // [0] = start, [1] = end, [2] = unlock seconds
+        uint256[2] memory _feeSettings, // [0] = token fee percent, [1] = eth fee percent
+        bool _useWhitelisting,
+        uint256 _liquidityPercent,
+        uint256 _refundType,
         string memory _poolDetails,
-        address[3] memory _linkAddress, // [0] factory ,[1] = manager 
-        uint8 _version,
-        uint256 _contributeWithdrawFee,
-        string[3] memory _otherInfo
+        address _poolOwner,
+        address _poolManager
     ) external override initializer {
         require(factory == address(0), "Pool: Forbidden");
         require(_addrs[0] != address(0), "Invalid Token address");
-        require(_saleInfo[2] <= _saleInfo[3], "Min contribution amount must be less than or equal to max");
-        require(_saleInfo[4].mul(2) >= _saleInfo[5] && _saleInfo[4] <= _saleInfo[5] && _saleInfo[5] > 0, "Softcap must be >= 50% of hardcap");
+        require(_contributionSettings[0] <= _contributionSettings[1], "Min contribution amount must be less than or equal to max");
+        require(_capSettings[0].mul(2) >= _capSettings[1] && _capSettings[0] <= _capSettings[1] && _capSettings[1] > 0, "Softcap must be >= 50% of hardcap");
         // require(_timeSettings[0] > block.timestamp, "Start time should be in the future");
-        require(_saleInfo[6] < _saleInfo[7], "End time must be after start time");
-        require(_saleInfo[8] >= MINIMUM_LOCK_DAYS, "Liquidity unlock time must be at least 1 Mintues after pool is finalized");
+        require(_timeSettings[0] < _timeSettings[1], "End time must be after start time");
+        require(_timeSettings[2] >= MINIMUM_LOCK_DAYS, "Liquidity unlock time must be at least 30 days after pool is finalized");
         require(
-            _saleInfo[12] >= 0 &&
-            _saleInfo[12] <= 100 &&
-            _saleInfo[13] >= 0 &&
-            _saleInfo[13] <= 100,
+            _feeSettings[0] >= 0 &&
+            _feeSettings[0] <= 100 &&
+            _feeSettings[1] >= 0 &&
+            _feeSettings[1] <= 100,
             "Invalid fee settings. Must be percentage (0 -> 100)"
         );
-        require (_saleInfo[0] >= _saleInfo[1], "Liquidity listing rate must be less than or equal to pool listing rate");
-        require(_saleInfo[14] >= 51 && _saleInfo[14] <= 100, "Invalid liquidity percentage");
-        require(_saleInfo[15] == 0 || _saleInfo[15] == 1, "Refund type must be 0 (refund) or 1 (burn)");
+        require (_rateSettings[0] >= _rateSettings[1], "Liquidity listing rate must be less than or equal to pool listing rate");
+        require(_liquidityPercent >= 51 && _liquidityPercent <= 100, "Invalid liquidity percentage");
+        require(_refundType == 0 || _refundType == 1, "Refund type must be 0 (refund) or 1 (burn)");
         OwnableUpgradeable.__Ownable_init();
-        transferOwnership(_linkAddress[0]);
-        factory = _linkAddress[1];
-        adminWallet = payable(_linkAddress[2]);
+        transferOwnership(_poolOwner);
+        factory = _poolManager;
         token = _addrs[0];
         router = _addrs[1];
         governance = _addrs[2];
-        currency = _addrs[3];
-        rate = _saleInfo[0];
-        liquidityListingRate = _saleInfo[1];
-        minContribution = _saleInfo[2];
-        maxContribution = _saleInfo[3];
-        softCap = _saleInfo[4];
-        hardCap = _saleInfo[5];
-        startTime = _saleInfo[6];
-        endTime = _saleInfo[7];
-        liquidityLockDays = _saleInfo[8];
-        tokenFeePercent = _saleInfo[12];
-        ethFeePercent = _saleInfo[13];
-        useWhitelisting = _saleInfo[9] == 1 ? true : false;
-        audit = _saleInfo[10] == 1 ? true : false;
-        kyc =   _saleInfo[11] == 1 ? true : false;
-        liquidityPercent = _saleInfo[14];
-        refundType = _saleInfo[15];
+        rate = _rateSettings[0];
+        liquidityListingRate = _rateSettings[1];
+        minContribution = _contributionSettings[0];
+        maxContribution = _contributionSettings[1];
+        softCap = _capSettings[0];
+        hardCap = _capSettings[1];
+        startTime = _timeSettings[0];
+        endTime = _timeSettings[1];
+        liquidityLockDays = _timeSettings[2];
+        tokenFeePercent = _feeSettings[0];
+        ethFeePercent = _feeSettings[1];
+        useWhitelisting = _useWhitelisting;
+        liquidityPercent = _liquidityPercent;
+        refundType = _refundType;
         poolDetails = _poolDetails;
         poolState = PoolState.inUse;
-        VERSION = _version;
-        poolType = PoolType.presale;
-        feesWithdraw = _contributeWithdrawFee;
-        auditLink = _otherInfo[0];
-        kycLink = _otherInfo[1];
-        ownerMail = _otherInfo[2];
-        MINIMUM_LOCK_DAYS = 5 minutes;
     }
 
     function initializeVesting(
-        uint256[3] memory _vestingInit  // [0] tgeBps [1] cycle, [2] cycleBps, 
+        uint256[7] memory _vestingInit  //  [0] _totalVestingTokens, [1] _tgeTime,  [2] _tgeTokenRelease,  [3] _cycle,  [4] _tokenReleaseEachCycle, [5] _eachvestingPer, [6] _tgeTokenReleasePer
     ) external override onlyOperator{
         require(factory != address(0), "Only Pool Factory");
         require(poolState == PoolState.inUse, "Pool Closed !");
-        require(_vestingInit[1] >= 0, "Invalid cycle");
-        require(_vestingInit[0] >= 0 && _vestingInit[0] < 10_000, "Invalid bips for TGE");
-        require(_vestingInit[2] >= 0 && _vestingInit[2] < 10_000, "Invalid bips for cycle");
-        require(
-            _vestingInit[0] + _vestingInit[2] <= 10_000,
-            "Sum of TGE bps and cycle should be less than 10000"
-        );
-
-        
-        tgeBps = _vestingInit[0]; 
-        cycle = _vestingInit[1];
-        cycleBps = _vestingInit[2]; 
-        
+        require(totalVestingTokens == 0, "Already initialized");
+        require(_vestingInit[2].add(_vestingInit[4]) <= _vestingInit[0], "Invalid token amount");
+        if (_vestingInit[0] > 0) {
+            require (_vestingInit[3] > 0, "Cycle cannot be 0");
+        }
+        totalVestingTokens = _vestingInit[0];
+        tgeLockDuration = _vestingInit[1];
+        tgeTokensRelease = _vestingInit[2];
+        cycle = _vestingInit[3];
+        tokensReleaseEachCycle = _vestingInit[4];
+        eachvestingPer = _vestingInit[5];
+        tgeTokenReleasePer = _vestingInit[6];
     }
 
     function addWhitelistedUsers(address[] memory users) external {
@@ -1661,160 +1489,80 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
         return whitelistedParticipantsPart;
     }
 
-    function getPoolInfo() external override view returns (address, address, uint8[] memory , uint256[] memory , string memory , string memory , string memory){
-       
-        uint8[] memory state = new uint8[](3);
-        uint256[] memory info = new uint256[](11);
-        
-        state[0] = uint8(poolState);
-        state[1] = uint8(poolType);
-        state[2] = IERC20(token).decimals();
-        info[0] = startTime;
-        info[1] =  endTime;
-        info[2] =  totalRaised;
-        info[3] = hardCap; 
-        info[4] = softCap; 
-        info[5] = minContribution; 
-        info[6] = maxContribution;
-        info[7] = rate;
-        info[8] = liquidityListingRate;
-        info[9] = liquidityPercent;
-        info[10] = liquidityUnlockTime;
-        
-        
-       return (token , currency, state , info , IERC20(token).name() , IERC20(token).symbol() , poolDetails);
+    function version() public override pure returns (uint8) {
+        return VERSION;
     }
 
-     
-    function contribute(uint256 _amount) public payable inProgress onlyWhitelisted{
-        uint256 amount = currency == address(0) ? msg.value : _amount;
-        require(amount > 0, "Cant contribute 0");
-
-        if(currency != address(0))
-            IERC20(currency).safeTransferFrom(msg.sender, address(this), amount);
-
-        uint256 userTotalContribution = contributionOf[msg.sender].add(amount);
+    function contribute() public payable inProgress {
+        require(msg.value > 0, "Cant contribute 0");
+        uint256 userTotalContribution = contributionOf[msg.sender].add(msg.value);
         // Allow to contribute with an amount less than min contribution
         // if the remaining contribution amount is less than min
         if (hardCap.sub(totalRaised) >= minContribution) {
             require(userTotalContribution >= minContribution, "Min contribution not reached");
         }
         require(userTotalContribution <= maxContribution, "Contribute more than allowed");
-        require(totalRaised.add(amount) <= hardCap, "Buying amount exceeds hard cap");
-        
-        
+        require(totalRaised.add(msg.value) <= hardCap, "Buying amount exceeds hard cap");
         if (contributionOf[msg.sender] == 0) {
             IPoolFactory(factory).recordContribution(msg.sender, address(this));
         }
         contributionOf[msg.sender] = userTotalContribution;
-        totalRaised = totalRaised.add(amount);
-        IPoolFactory(factory).addTopPool(address(this), currency, totalRaised);
-        uint256 volume = PoolLibrary.convertCurrencyToToken(amount, rate);
+        totalRaised = totalRaised.add(msg.value);
+        uint256 volume = PoolLibrary.convertCurrencyToToken(msg.value, rate);
         require(volume > 0, "Contribution too small to produce any volume");
         purchasedOf[msg.sender] = purchasedOf[msg.sender].add(volume);
         totalVolumePurchased = totalVolumePurchased.add(volume);
-        emit Contributed(msg.sender, amount, volume, totalVolumePurchased, block.timestamp);
+        emit Contributed(msg.sender, msg.value, volume, totalVolumePurchased, block.timestamp);
     }
 
-     function claim() public noReentrant {
+    
+
+    function claim() public {
         require(poolState == PoolState.completed, "Owner has not closed the pool yet");
-        require(tgeDate <= block.timestamp , "pool still not finalized!!!");
         uint256 volume = purchasedOf[msg.sender];
         uint256 totalClaim = claimedOf[msg.sender];
-        uint256 withdrawable = 0;
-
-        if (tgeBps > 0) {
-            withdrawable = _withdrawableTokens();
+        uint256 totalAvalible = 0;
+        
+        if(tgeTime <= block.timestamp){
+            totalAvalible += volume - totalClaim;
         }
         else{
-            if(volume >= totalClaim){
-                withdrawable = volume.sub(totalClaim);
-            }
-            else{
-                withdrawable = 0;
-            }
+            uint256 vestingAmount = volume - ((volume * tgeTokenReleasePer) / 100);
+            uint256 eachCycleToken = vestingAmount / cycle;
+            uint256 _startTime = tgeTime - tgeLockDuration;
+            uint256 eachLockPeriod = tgeLockDuration / cycle;
+            uint256 passPeriod = block.timestamp - _startTime;
+            totalAvalible += ((passPeriod / eachLockPeriod) * eachCycleToken) + ((volume * tgeTokenReleasePer) / 100);
         }
 
-        require(withdrawable > 0 , "No token avalible for claim!!");
-        claimedOf[msg.sender] += withdrawable;
-        totalClaimed = totalClaimed.add(withdrawable);
-        IERC20(token).safeTransfer(msg.sender, withdrawable);
-        emit Claimed(msg.sender, volume, withdrawable);
+        require(totalAvalible > totalClaim , "NO Reward Avalible For Claim");
+        uint256 claimble = totalAvalible.sub(totalClaim);
+        claimedOf[msg.sender] = totalAvalible;
+        totalClaimed = totalClaimed.add(claimble);
+        IERC20(token).safeTransfer(msg.sender, claimble);
+        emit Claimed(msg.sender, volume, totalClaimed);
+        
     }
 
-    function _withdrawableTokens()
-        internal
-        view
-        returns (uint256)
-    {
-        uint256 volume = purchasedOf[msg.sender];
-        uint256 totalClaim = claimedOf[msg.sender];
-        if (volume == 0) return 0;
-        if (totalClaim >= volume) return 0;
-        if (block.timestamp < tgeDate) return 0;
-        if (cycle == 0) return 0;
-
-        uint256 tgeReleaseAmount = FullMath.mulDiv(
-            volume,
-            tgeBps,
-            10_000
-        );
-        uint256 cycleReleaseAmount = FullMath.mulDiv(
-            volume,
-            cycleBps,
-            10_000
-        );
-        uint256 currentTotal = 0;
-        if (block.timestamp >= tgeDate) {
-            currentTotal =
-                (((block.timestamp - tgeDate) / cycle) *
-                    cycleReleaseAmount) +
-                tgeReleaseAmount; // Truncation is expected here
-        }
-        uint256 withdrawable = 0;
-        if (currentTotal > volume) {
-            withdrawable = volume - totalClaim;
-        } else {
-            withdrawable = currentTotal - totalClaim;
-        }
-        return withdrawable;
-    }
-
-    function withdrawContribution() external noReentrant {
+    function withdrawContribution() external {
         if (poolState == PoolState.inUse) {
             require(block.timestamp >= endTime, "Pool is still in progress");
             require(totalRaised < softCap, "Soft cap reached");
         } else {
             require(poolState == PoolState.cancelled, "Cannot withdraw contribution because pool is completed");
         }
-        require(contributionOf[msg.sender] > 0, "You Don't Have Enough contribution");
-        uint256 fees = 0;
-        if(poolState == PoolState.inUse){
-            fees = feesWithdraw;
-        }
+        require(refundedOf[msg.sender] == 0, "Already withdrawn contribution");
+
         uint256 refundAmount = contributionOf[msg.sender];
-        totalVolumePurchased = totalVolumePurchased.sub(purchasedOf[msg.sender]);
-        
         refundedOf[msg.sender] = refundAmount;
         totalRefunded = totalRefunded.add(refundAmount);
         contributionOf[msg.sender] = 0;
-        purchasedOf[msg.sender] = 0;
-        totalRaised = totalRaised.sub(refundAmount);
-        uint256 Countfees = refundAmount.mul(fees).div(10000);
-        refundAmount = refundAmount.sub(Countfees);
 
-        if(currency == address(0)) {
-            payable(msg.sender).sendValue(refundAmount);
-            payable(adminWallet).sendValue(Countfees);
-        } else {
-            IERC20(currency).safeTransfer(msg.sender, refundAmount);
-            IERC20(currency).safeTransfer(adminWallet, Countfees);
-        }
-
+        payable(msg.sender).sendValue(refundAmount);
         emit WithdrawnContribution(msg.sender, refundAmount);
     }
 
-    function finalize() external onlyOperator noReentrant {
+    function finalize() external onlyOperator {
         require(poolState == PoolState.inUse, "Pool was finialized or cancelled");
         require(
             totalRaised == hardCap || hardCap.sub(totalRaised) < minContribution ||
@@ -1825,12 +1573,12 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
         poolState = PoolState.completed;
 
         liquidityUnlockTime = block.timestamp + liquidityLockDays;
-        tgeDate = block.timestamp; 
+        tgeTime = block.timestamp + tgeLockDuration; 
 
         (
-            uint256 ethFee,
+            uint256 bnbFee,
             uint256 tokenFee,
-            uint256 liquidityEth,
+            uint256 liquidityBnb,
             uint256 liquidityToken
         ) = PoolLibrary.calculateFeeAndLiquidity(
             totalRaised, 
@@ -1841,54 +1589,43 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
             liquidityListingRate
         );
        
-        uint256 currencyAmount = currency == address(0) ? address(this).balance : IERC20(currency).balanceOf(address(this));
-        uint256 remainingEth = currencyAmount.sub(liquidityEth).sub(ethFee);
+        uint256 remainingBnb = address(this).balance.sub(liquidityBnb).sub(bnbFee);
         uint256 remainingToken = 0;
 
         uint256 totalTokenSpent = liquidityToken.add(tokenFee).add(totalVolumePurchased);
-        remainingToken += IERC20(token).balanceOf(address(this)).sub(totalTokenSpent);
-        
+        uint256 balanceWithoutVesting = IERC20(token).balanceOf(address(this)).sub(totalVestingTokens);
+        if (balanceWithoutVesting > totalTokenSpent) {
+            remainingToken = balanceWithoutVesting.sub(totalTokenSpent);
+        }
 
         // Pay platform fees
-        if(ethFee > 0){
-            if(currency == address(0))
-                payable(adminWallet).sendValue(ethFee);
-            else
-                IERC20(currency).safeTransfer(adminWallet, ethFee);
-        }
-        if(tokenFee > 0){
-            IERC20(token).safeTransfer(adminWallet, tokenFee);
-        }
+        payable(governance).sendValue(bnbFee);
+        IERC20(token).safeTransfer(governance, tokenFee);
 
         // Refund remaining
-        if (remainingEth > 0) {
-            if(currency == address(0))
-                payable(governance).sendValue(remainingEth);
-            else
-                IERC20(currency).safeTransfer(governance, remainingEth);
+        if (remainingBnb > 0) {
+            payable(owner()).sendValue(remainingBnb);
         }
        
-        if (remainingToken > 0) {
+       if (remainingToken > 0) {
             // 0: refund, 1: burn
             if (refundType == 0) {
-                IERC20(token).safeTransfer(governance, remainingToken);
+                IERC20(token).safeTransfer(owner(), remainingToken);
             } else {
                 IERC20(token).safeTransfer(address(0xdead), remainingToken);
             }
-        }
+       }
 
-        tvl = liquidityEth.mul(2);
-        IPoolFactory(factory).increaseTotalValueLocked(currency, tvl);
+        tvl = liquidityBnb.mul(2);
+        IPoolFactory(factory).increaseTotalValueLocked(tvl);
 
         uint256 liquidity = PoolLibrary.addLiquidity(
             router,
-            currency,
             token,
-            liquidityEth,
+            liquidityBnb,
             liquidityToken,
             address(this)
         );
-        IPoolFactory(factory).removeTopPool(address(this));
         emit Finalized(liquidity, block.timestamp);
     }
 
@@ -1896,49 +1633,43 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
         require (poolState == PoolState.inUse, "Pool was either finished or cancelled");
         poolState = PoolState.cancelled;
         IPoolFactory(factory).removePoolForToken(token, address(this));
-        IERC20(token).safeTransfer(governance, IERC20(token).balanceOf(address(this)));
-        IPoolFactory(factory).removeTopPool(address(this));
+        IERC20(token).safeTransfer(owner(), IERC20(token).balanceOf(address(this)));
         emit Cancelled(block.timestamp);
     }
 
-    function withdrawLeftovers() external onlyOperator noReentrant {
+    function withdrawLeftovers() external onlyOperator {
         require(block.timestamp >= endTime, "It is not time to withdraw leftovers");
         require(totalRaised < softCap, "Soft cap reached, call finalize() instead");
-        IERC20(token).safeTransfer(governance, IERC20(token).balanceOf(address(this)));
+        IERC20(token).safeTransfer(owner(), IERC20(token).balanceOf(address(this)));
     }
 
     function withdrawLiquidity() external onlyOperator {
         require(poolState == PoolState.completed, "Pool has not been finalized");
         require(block.timestamp >= liquidityUnlockTime, "It is not time to unlock liquidity");
-        IPoolFactory(factory).decreaseTotalValueLocked(currency, tvl);
+        IPoolFactory(factory).decreaseTotalValueLocked(tvl);
         tvl = 0;
         address swapFactory = IUniswapV2Router02(router).factory();
         address pair = IUniswapV2Factory(swapFactory).getPair(
-            currency == address(0) ? IUniswapV2Router02(router).WETH() : currency,
+            IUniswapV2Router02(router).WETH(),
             token
         );
         uint256 balance = IERC20(pair).balanceOf(address(this));
-        IERC20(pair).safeTransfer(governance, balance);
+        IERC20(pair).safeTransfer(owner(), balance);
 
         emit LiquidityWithdrawn(balance, block.timestamp);
     }
 
-    function emergencyWithdrawLiquidity(address token_, address to_, uint256 amount_) external override onlyOwner {
+    function emergencyWithdraw(address token_, address to_, uint256 amount_) external onlyGovernance {
         address swapFactory = IUniswapV2Router02(router).factory();
         address pair = IUniswapV2Factory(swapFactory).getPair(
-            currency == address(0) ? IUniswapV2Router02(router).WETH() : currency,
+            IUniswapV2Router02(router).WETH(),
             token
         );
         require(token_ != pair, "Cannot withdraw liquidity. Use withdrawLiquidity() instead");
         IERC20(token_).safeTransfer(to_, amount_);
     }
 
-    function emergencyWithdrawToken( address payaddress ,address tokenAddress, uint256 tokens ) external override onlyOwner 
-    {
-       IERC20(tokenAddress).transfer(payaddress, tokens);
-    }
-
-    function emergencyWithdraw(address payable to_, uint256 amount_) external override onlyOwner {
+    function emergencyWithdraw(address payable to_, uint256 amount_) external onlyGovernance {
         to_.sendValue(amount_);
     }
 
@@ -1947,12 +1678,12 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
         emit PoolUpdated(block.timestamp);
     }
 
-    function updateCompletedKyc(bool completed_) external onlyOwner {
+    function updateCompletedKyc(bool completed_) external onlyGovernance {
         completedKyc = completed_;
         emit KycUpdated(completed_, block.timestamp);
     }
 
-    function setGovernance(address governance_) external override onlyOwner {
+    function setGovernance(address governance_) external onlyGovernance {
         governance = governance_;
     }
 
@@ -1970,7 +1701,7 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
     function liquidityBalance() public view returns (uint256) {
         address swapFactory = IUniswapV2Router02(router).factory();
         address pair = IUniswapV2Factory(swapFactory).getPair(
-            currency == address(0) ? IUniswapV2Router02(router).WETH() : currency,
+            IUniswapV2Router02(router).WETH(),
             token
         );
         if (pair == address(0)) return 0;
@@ -1989,64 +1720,20 @@ contract PresalePool is OwnableUpgradeable, IPool , ReEntrancyGuard {
         return (totalRaised, uint8(poolState), completedKyc, liquidityUnlockTime, poolDetails);
     }
 
-    function userAvalibleClaim(address _userAddress) public view returns (uint256){
-        uint256 volume = purchasedOf[_userAddress];
-        uint256 totalClaim = claimedOf[_userAddress];
-        uint256 withdrawable = 0;
-        if(tgeDate <= block.timestamp){
-           
-            if (tgeBps > 0) {
-                if (volume == 0) return 0;
-                if (totalClaim >= volume) return 0;
-                if (block.timestamp < tgeDate) return 0;
-                if (cycle == 0) return 0;
-
-                uint256 tgeReleaseAmount = FullMath.mulDiv(
-                    volume,
-                    tgeBps,
-                    10_000
-                );
-                uint256 cycleReleaseAmount = FullMath.mulDiv(
-                    volume,
-                    cycleBps,
-                    10_000
-                );
-                uint256 currentTotal = 0;
-                if (block.timestamp >= tgeDate) {
-                    currentTotal =
-                        (((block.timestamp - tgeDate) / cycle) *
-                            cycleReleaseAmount) +
-                        tgeReleaseAmount; // Truncation is expected here
-                }
-                if (currentTotal > volume) {
-                    withdrawable = volume - totalClaim;
-                } else {
-                    withdrawable = currentTotal - totalClaim;
-                }
-                
-            }
-            else{
-                if(volume >= totalClaim){
-                    withdrawable = volume.sub(totalClaim);
-                }
-                else{
-                    withdrawable = 0;
-                }
-            }
-        }
-
-        return withdrawable;
-        
+    function withdrawableTokens() public view returns (uint256) {
+        return PoolLibrary.withdrawableVestingTokens(
+            tgeTime, 
+            cycle, 
+            tokensReleaseEachCycle, 
+            tgeTokensRelease, 
+            totalVestingTokens, 
+            totalVestedTokens
+        );
     }
 
-    function setKycAudit(bool _kyc , bool _audit , string memory _kyclink,string memory _auditlink) override external onlyOwner{
-        kycStatus = _kyc;
-        auditStatus = _audit;
-        kycLink=_kyclink;
-        auditLink=_auditlink;
+    function setEndTime(uint256 _timeStamp) public onlyGovernance{
+        endTime = _timeStamp;
     }
 
-    function setWhitelisting(bool _whitelisting) public onlyOperator{
-        useWhitelisting = _whitelisting;
-    }
+   
 }

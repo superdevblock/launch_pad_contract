@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.4;
 
-
-
 library Address {
     /**
      * @dev Returns true if `account` is a contract.
@@ -55,10 +53,16 @@ library Address {
      * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
      */
     function sendValue(address payable recipient, uint256 amount) internal {
-        require(address(this).balance >= amount, "Address: insufficient balance");
+        require(
+            address(this).balance >= amount,
+            "Address: insufficient balance"
+        );
 
         (bool success, ) = recipient.call{value: amount}("");
-        require(success, "Address: unable to send value, recipient may have reverted");
+        require(
+            success,
+            "Address: unable to send value, recipient may have reverted"
+        );
     }
 
     /**
@@ -79,7 +83,10 @@ library Address {
      *
      * _Available since v3.1._
      */
-    function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+    function functionCall(
+        address target,
+        bytes memory data
+    ) internal returns (bytes memory) {
         return functionCall(target, data, "Address: low-level call failed");
     }
 
@@ -113,7 +120,13 @@ library Address {
         bytes memory data,
         uint256 value
     ) internal returns (bytes memory) {
-        return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
+        return
+            functionCallWithValue(
+                target,
+                data,
+                value,
+                "Address: low-level call with value failed"
+            );
     }
 
     /**
@@ -128,10 +141,15 @@ library Address {
         uint256 value,
         string memory errorMessage
     ) internal returns (bytes memory) {
-        require(address(this).balance >= value, "Address: insufficient balance for call");
+        require(
+            address(this).balance >= value,
+            "Address: insufficient balance for call"
+        );
         require(isContract(target), "Address: call to non-contract");
 
-        (bool success, bytes memory returndata) = target.call{value: value}(data);
+        (bool success, bytes memory returndata) = target.call{value: value}(
+            data
+        );
         return verifyCallResult(success, returndata, errorMessage);
     }
 
@@ -141,8 +159,16 @@ library Address {
      *
      * _Available since v3.3._
      */
-    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
-        return functionStaticCall(target, data, "Address: low-level static call failed");
+    function functionStaticCall(
+        address target,
+        bytes memory data
+    ) internal view returns (bytes memory) {
+        return
+            functionStaticCall(
+                target,
+                data,
+                "Address: low-level static call failed"
+            );
     }
 
     /**
@@ -168,8 +194,16 @@ library Address {
      *
      * _Available since v3.4._
      */
-    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
-        return functionDelegateCall(target, data, "Address: low-level delegate call failed");
+    function functionDelegateCall(
+        address target,
+        bytes memory data
+    ) internal returns (bytes memory) {
+        return
+            functionDelegateCall(
+                target,
+                data,
+                "Address: low-level delegate call failed"
+            );
     }
 
     /**
@@ -245,7 +279,10 @@ interface IERC20 {
      *
      * This value changes when {approve} or {transferFrom} are called.
      */
-    function allowance(address owner, address spender) external view returns (uint256);
+    function allowance(
+        address owner,
+        address spender
+    ) external view returns (uint256);
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
@@ -290,18 +327,21 @@ interface IERC20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 }
 
 library SafeERC20 {
     using Address for address;
 
-    function safeTransfer(
-        IERC20 token,
-        address to,
-        uint256 value
-    ) internal {
-        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));
+    function safeTransfer(IERC20 token, address to, uint256 value) internal {
+        _callOptionalReturn(
+            token,
+            abi.encodeWithSelector(token.transfer.selector, to, value)
+        );
     }
 
     function safeTransferFrom(
@@ -310,7 +350,10 @@ library SafeERC20 {
         address to,
         uint256 value
     ) internal {
-        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));
+        _callOptionalReturn(
+            token,
+            abi.encodeWithSelector(token.transferFrom.selector, from, to, value)
+        );
     }
 
     /**
@@ -332,7 +375,10 @@ library SafeERC20 {
             (value == 0) || (token.allowance(address(this), spender) == 0),
             "SafeERC20: approve from non-zero to non-zero allowance"
         );
-        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));
+        _callOptionalReturn(
+            token,
+            abi.encodeWithSelector(token.approve.selector, spender, value)
+        );
     }
 
     function safeIncreaseAllowance(
@@ -341,7 +387,14 @@ library SafeERC20 {
         uint256 value
     ) internal {
         uint256 newAllowance = token.allowance(address(this), spender) + value;
-        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+        _callOptionalReturn(
+            token,
+            abi.encodeWithSelector(
+                token.approve.selector,
+                spender,
+                newAllowance
+            )
+        );
     }
 
     function safeDecreaseAllowance(
@@ -351,9 +404,19 @@ library SafeERC20 {
     ) internal {
         unchecked {
             uint256 oldAllowance = token.allowance(address(this), spender);
-            require(oldAllowance >= value, "SafeERC20: decreased allowance below zero");
+            require(
+                oldAllowance >= value,
+                "SafeERC20: decreased allowance below zero"
+            );
             uint256 newAllowance = oldAllowance - value;
-            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));
+            _callOptionalReturn(
+                token,
+                abi.encodeWithSelector(
+                    token.approve.selector,
+                    spender,
+                    newAllowance
+                )
+            );
         }
     }
 
@@ -368,10 +431,16 @@ library SafeERC20 {
         // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
         // the target address contains contract code and also asserts for success in the low-level call.
 
-        bytes memory returndata = address(token).functionCall(data, "SafeERC20: low-level call failed");
+        bytes memory returndata = address(token).functionCall(
+            data,
+            "SafeERC20: low-level call failed"
+        );
         if (returndata.length > 0) {
             // Return data is optional
-            require(abi.decode(returndata, (bool)), "SafeERC20: ERC20 operation did not succeed");
+            require(
+                abi.decode(returndata, (bool)),
+                "SafeERC20: ERC20 operation did not succeed"
+            );
         }
     }
 }
@@ -455,7 +524,10 @@ library EnumerableSet {
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function _contains(Set storage set, bytes32 value) private view returns (bool) {
+    function _contains(
+        Set storage set,
+        bytes32 value
+    ) private view returns (bool) {
         return set._indexes[value] != 0;
     }
 
@@ -476,7 +548,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function _at(Set storage set, uint256 index) private view returns (bytes32) {
+    function _at(
+        Set storage set,
+        uint256 index
+    ) private view returns (bytes32) {
         return set._values[index];
     }
 
@@ -504,7 +579,10 @@ library EnumerableSet {
      * Returns true if the value was added to the set, that is if it was not
      * already present.
      */
-    function add(Bytes32Set storage set, bytes32 value) internal returns (bool) {
+    function add(
+        Bytes32Set storage set,
+        bytes32 value
+    ) internal returns (bool) {
         return _add(set._inner, value);
     }
 
@@ -514,14 +592,20 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(Bytes32Set storage set, bytes32 value) internal returns (bool) {
+    function remove(
+        Bytes32Set storage set,
+        bytes32 value
+    ) internal returns (bool) {
         return _remove(set._inner, value);
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(Bytes32Set storage set, bytes32 value) internal view returns (bool) {
+    function contains(
+        Bytes32Set storage set,
+        bytes32 value
+    ) internal view returns (bool) {
         return _contains(set._inner, value);
     }
 
@@ -542,7 +626,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32) {
+    function at(
+        Bytes32Set storage set,
+        uint256 index
+    ) internal view returns (bytes32) {
         return _at(set._inner, index);
     }
 
@@ -554,7 +641,9 @@ library EnumerableSet {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function values(Bytes32Set storage set) internal view returns (bytes32[] memory) {
+    function values(
+        Bytes32Set storage set
+    ) internal view returns (bytes32[] memory) {
         return _values(set._inner);
     }
 
@@ -570,7 +659,10 @@ library EnumerableSet {
      * Returns true if the value was added to the set, that is if it was not
      * already present.
      */
-    function add(AddressSet storage set, address value) internal returns (bool) {
+    function add(
+        AddressSet storage set,
+        address value
+    ) internal returns (bool) {
         return _add(set._inner, bytes32(uint256(uint160(value))));
     }
 
@@ -580,14 +672,20 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(AddressSet storage set, address value) internal returns (bool) {
+    function remove(
+        AddressSet storage set,
+        address value
+    ) internal returns (bool) {
         return _remove(set._inner, bytes32(uint256(uint160(value))));
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(AddressSet storage set, address value) internal view returns (bool) {
+    function contains(
+        AddressSet storage set,
+        address value
+    ) internal view returns (bool) {
         return _contains(set._inner, bytes32(uint256(uint160(value))));
     }
 
@@ -608,7 +706,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(AddressSet storage set, uint256 index) internal view returns (address) {
+    function at(
+        AddressSet storage set,
+        uint256 index
+    ) internal view returns (address) {
         return address(uint160(uint256(_at(set._inner, index))));
     }
 
@@ -620,7 +721,9 @@ library EnumerableSet {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function values(AddressSet storage set) internal view returns (address[] memory) {
+    function values(
+        AddressSet storage set
+    ) internal view returns (address[] memory) {
         bytes32[] memory store = _values(set._inner);
         address[] memory result;
 
@@ -653,14 +756,20 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(UintSet storage set, uint256 value) internal returns (bool) {
+    function remove(
+        UintSet storage set,
+        uint256 value
+    ) internal returns (bool) {
         return _remove(set._inner, bytes32(value));
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(UintSet storage set, uint256 value) internal view returns (bool) {
+    function contains(
+        UintSet storage set,
+        uint256 value
+    ) internal view returns (bool) {
         return _contains(set._inner, bytes32(value));
     }
 
@@ -681,7 +790,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(UintSet storage set, uint256 index) internal view returns (uint256) {
+    function at(
+        UintSet storage set,
+        uint256 index
+    ) internal view returns (uint256) {
         return uint256(_at(set._inner, index));
     }
 
@@ -693,7 +805,9 @@ library EnumerableSet {
      * this function has an unbounded cost, and using it as part of a state-changing function may render the function
      * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.
      */
-    function values(UintSet storage set) internal view returns (uint256[] memory) {
+    function values(
+        UintSet storage set
+    ) internal view returns (uint256[] memory) {
         bytes32[] memory store = _values(set._inner);
         uint256[] memory result;
 
@@ -718,7 +832,10 @@ abstract contract Context {
 abstract contract Ownable is Context {
     address private _owner;
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
@@ -765,7 +882,10 @@ abstract contract Ownable is Context {
      * Can only be called by the current owner.
      */
     function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
         _transferOwnership(newOwner);
     }
 
@@ -780,7 +900,7 @@ abstract contract Ownable is Context {
     }
 }
 
-interface INovaLock {
+interface I0xLaunchLock {
     function lock(
         address owner,
         address token,
@@ -824,452 +944,442 @@ interface INovaLock {
 }
 
 interface IUniswapV2Router01 {
-  function factory() external pure returns (address);
+    function factory() external pure returns (address);
 
-  function WETH() external pure returns (address);
+    function WETH() external pure returns (address);
 
-  function addLiquidity(
-    address tokenA,
-    address tokenB,
-    uint256 amountADesired,
-    uint256 amountBDesired,
-    uint256 amountAMin,
-    uint256 amountBMin,
-    address to,
-    uint256 deadline
-  )
-    external
-    returns (
-      uint256 amountA,
-      uint256 amountB,
-      uint256 liquidity
-    );
+    function addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 amountADesired,
+        uint256 amountBDesired,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline
+    ) external returns (uint256 amountA, uint256 amountB, uint256 liquidity);
 
-  function addLiquidityETH(
-    address token,
-    uint256 amountTokenDesired,
-    uint256 amountTokenMin,
-    uint256 amountETHMin,
-    address to,
-    uint256 deadline
-  )
-    external
-    payable
-    returns (
-      uint256 amountToken,
-      uint256 amountETH,
-      uint256 liquidity
-    );
+    function addLiquidityETH(
+        address token,
+        uint256 amountTokenDesired,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
+        address to,
+        uint256 deadline
+    )
+        external
+        payable
+        returns (uint256 amountToken, uint256 amountETH, uint256 liquidity);
 
-  function removeLiquidity(
-    address tokenA,
-    address tokenB,
-    uint256 liquidity,
-    uint256 amountAMin,
-    uint256 amountBMin,
-    address to,
-    uint256 deadline
-  ) external returns (uint256 amountA, uint256 amountB);
+    function removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline
+    ) external returns (uint256 amountA, uint256 amountB);
 
-  function removeLiquidityETH(
-    address token,
-    uint256 liquidity,
-    uint256 amountTokenMin,
-    uint256 amountETHMin,
-    address to,
-    uint256 deadline
-  ) external returns (uint256 amountToken, uint256 amountETH);
+    function removeLiquidityETH(
+        address token,
+        uint256 liquidity,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
+        address to,
+        uint256 deadline
+    ) external returns (uint256 amountToken, uint256 amountETH);
 
-  function removeLiquidityWithPermit(
-    address tokenA,
-    address tokenB,
-    uint256 liquidity,
-    uint256 amountAMin,
-    uint256 amountBMin,
-    address to,
-    uint256 deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external returns (uint256 amountA, uint256 amountB);
+    function removeLiquidityWithPermit(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline,
+        bool approveMax,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external returns (uint256 amountA, uint256 amountB);
 
-  function removeLiquidityETHWithPermit(
-    address token,
-    uint256 liquidity,
-    uint256 amountTokenMin,
-    uint256 amountETHMin,
-    address to,
-    uint256 deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external returns (uint256 amountToken, uint256 amountETH);
+    function removeLiquidityETHWithPermit(
+        address token,
+        uint256 liquidity,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
+        address to,
+        uint256 deadline,
+        bool approveMax,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external returns (uint256 amountToken, uint256 amountETH);
 
-  function swapExactTokensForTokens(
-    uint256 amountIn,
-    uint256 amountOutMin,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external returns (uint256[] memory amounts);
+    function swapExactTokensForTokens(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
 
-  function swapTokensForExactTokens(
-    uint256 amountOut,
-    uint256 amountInMax,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external returns (uint256[] memory amounts);
+    function swapTokensForExactTokens(
+        uint256 amountOut,
+        uint256 amountInMax,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
 
-  function swapExactETHForTokens(
-    uint256 amountOutMin,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external payable returns (uint256[] memory amounts);
+    function swapExactETHForTokens(
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external payable returns (uint256[] memory amounts);
 
-  function swapTokensForExactETH(
-    uint256 amountOut,
-    uint256 amountInMax,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external returns (uint256[] memory amounts);
+    function swapTokensForExactETH(
+        uint256 amountOut,
+        uint256 amountInMax,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
 
-  function swapExactTokensForETH(
-    uint256 amountIn,
-    uint256 amountOutMin,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external returns (uint256[] memory amounts);
+    function swapExactTokensForETH(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external returns (uint256[] memory amounts);
 
-  function swapETHForExactTokens(
-    uint256 amountOut,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external payable returns (uint256[] memory amounts);
+    function swapETHForExactTokens(
+        uint256 amountOut,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external payable returns (uint256[] memory amounts);
 
-  function quote(
-    uint256 amountA,
-    uint256 reserveA,
-    uint256 reserveB
-  ) external pure returns (uint256 amountB);
+    function quote(
+        uint256 amountA,
+        uint256 reserveA,
+        uint256 reserveB
+    ) external pure returns (uint256 amountB);
 
-  function getAmountOut(
-    uint256 amountIn,
-    uint256 reserveIn,
-    uint256 reserveOut
-  ) external pure returns (uint256 amountOut);
+    function getAmountOut(
+        uint256 amountIn,
+        uint256 reserveIn,
+        uint256 reserveOut
+    ) external pure returns (uint256 amountOut);
 
-  function getAmountIn(
-    uint256 amountOut,
-    uint256 reserveIn,
-    uint256 reserveOut
-  ) external pure returns (uint256 amountIn);
+    function getAmountIn(
+        uint256 amountOut,
+        uint256 reserveIn,
+        uint256 reserveOut
+    ) external pure returns (uint256 amountIn);
 
-  function getAmountsOut(uint256 amountIn, address[] calldata path)
-    external
-    view
-    returns (uint256[] memory amounts);
+    function getAmountsOut(
+        uint256 amountIn,
+        address[] calldata path
+    ) external view returns (uint256[] memory amounts);
 
-  function getAmountsIn(uint256 amountOut, address[] calldata path)
-    external
-    view
-    returns (uint256[] memory amounts);
+    function getAmountsIn(
+        uint256 amountOut,
+        address[] calldata path
+    ) external view returns (uint256[] memory amounts);
 }
 
 interface IUniswapV2Router02 is IUniswapV2Router01 {
-  function removeLiquidityETHSupportingFeeOnTransferTokens(
-    address token,
-    uint256 liquidity,
-    uint256 amountTokenMin,
-    uint256 amountETHMin,
-    address to,
-    uint256 deadline
-  ) external returns (uint256 amountETH);
+    function removeLiquidityETHSupportingFeeOnTransferTokens(
+        address token,
+        uint256 liquidity,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
+        address to,
+        uint256 deadline
+    ) external returns (uint256 amountETH);
 
-  function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
-    address token,
-    uint256 liquidity,
-    uint256 amountTokenMin,
-    uint256 amountETHMin,
-    address to,
-    uint256 deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external returns (uint256 amountETH);
+    function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
+        address token,
+        uint256 liquidity,
+        uint256 amountTokenMin,
+        uint256 amountETHMin,
+        address to,
+        uint256 deadline,
+        bool approveMax,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external returns (uint256 amountETH);
 
-  function swapExactTokensForTokensSupportingFeeOnTransferTokens(
-    uint256 amountIn,
-    uint256 amountOutMin,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external;
+    function swapExactTokensForTokensSupportingFeeOnTransferTokens(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external;
 
-  function swapExactETHForTokensSupportingFeeOnTransferTokens(
-    uint256 amountOutMin,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external payable;
+    function swapExactETHForTokensSupportingFeeOnTransferTokens(
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external payable;
 
-  function swapExactTokensForETHSupportingFeeOnTransferTokens(
-    uint256 amountIn,
-    uint256 amountOutMin,
-    address[] calldata path,
-    address to,
-    uint256 deadline
-  ) external;
+    function swapExactTokensForETHSupportingFeeOnTransferTokens(
+        uint256 amountIn,
+        uint256 amountOutMin,
+        address[] calldata path,
+        address to,
+        uint256 deadline
+    ) external;
 }
 
 interface IUniswapV2Pair {
-  event Approval(address indexed owner, address indexed spender, uint256 value);
-  event Transfer(address indexed from, address indexed to, uint256 value);
-
-  function name() external pure returns (string memory);
-
-  function symbol() external pure returns (string memory);
-
-  function decimals() external pure returns (uint8);
-
-  function totalSupply() external view returns (uint256);
-
-  function balanceOf(address owner) external view returns (uint256);
-
-  function allowance(address owner, address spender)
-    external
-    view
-    returns (uint256);
-
-  function approve(address spender, uint256 value) external returns (bool);
-
-  function transfer(address to, uint256 value) external returns (bool);
-
-  function transferFrom(
-    address from,
-    address to,
-    uint256 value
-  ) external returns (bool);
-
-  function DOMAIN_SEPARATOR() external view returns (bytes32);
-
-  function PERMIT_TYPEHASH() external pure returns (bytes32);
-
-  function nonces(address owner) external view returns (uint256);
-
-  function permit(
-    address owner,
-    address spender,
-    uint256 value,
-    uint256 deadline,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external;
-
-  event Mint(address indexed sender, uint256 amount0, uint256 amount1);
-  event Burn(
-    address indexed sender,
-    uint256 amount0,
-    uint256 amount1,
-    address indexed to
-  );
-  event Swap(
-    address indexed sender,
-    uint256 amount0In,
-    uint256 amount1In,
-    uint256 amount0Out,
-    uint256 amount1Out,
-    address indexed to
-  );
-  event Sync(uint112 reserve0, uint112 reserve1);
-
-  function MINIMUM_LIQUIDITY() external pure returns (uint256);
-
-  function factory() external view returns (address);
-
-  function token0() external view returns (address);
-
-  function token1() external view returns (address);
-
-  function getReserves()
-    external
-    view
-    returns (
-      uint112 reserve0,
-      uint112 reserve1,
-      uint32 blockTimestampLast
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
     );
+    event Transfer(address indexed from, address indexed to, uint256 value);
 
-  function price0CumulativeLast() external view returns (uint256);
+    function name() external pure returns (string memory);
 
-  function price1CumulativeLast() external view returns (uint256);
+    function symbol() external pure returns (string memory);
 
-  function kLast() external view returns (uint256);
+    function decimals() external pure returns (uint8);
 
-  function mint(address to) external returns (uint256 liquidity);
+    function totalSupply() external view returns (uint256);
 
-  function burn(address to) external returns (uint256 amount0, uint256 amount1);
+    function balanceOf(address owner) external view returns (uint256);
 
-  function swap(
-    uint256 amount0Out,
-    uint256 amount1Out,
-    address to,
-    bytes calldata data
-  ) external;
+    function allowance(
+        address owner,
+        address spender
+    ) external view returns (uint256);
 
-  function skim(address to) external;
+    function approve(address spender, uint256 value) external returns (bool);
 
-  function sync() external;
+    function transfer(address to, uint256 value) external returns (bool);
 
-  function initialize(address, address) external;
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) external returns (bool);
+
+    function DOMAIN_SEPARATOR() external view returns (bytes32);
+
+    function PERMIT_TYPEHASH() external pure returns (bytes32);
+
+    function nonces(address owner) external view returns (uint256);
+
+    function permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
+
+    event Mint(address indexed sender, uint256 amount0, uint256 amount1);
+    event Burn(
+        address indexed sender,
+        uint256 amount0,
+        uint256 amount1,
+        address indexed to
+    );
+    event Swap(
+        address indexed sender,
+        uint256 amount0In,
+        uint256 amount1In,
+        uint256 amount0Out,
+        uint256 amount1Out,
+        address indexed to
+    );
+    event Sync(uint112 reserve0, uint112 reserve1);
+
+    function MINIMUM_LIQUIDITY() external pure returns (uint256);
+
+    function factory() external view returns (address);
+
+    function token0() external view returns (address);
+
+    function token1() external view returns (address);
+
+    function getReserves()
+        external
+        view
+        returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
+
+    function price0CumulativeLast() external view returns (uint256);
+
+    function price1CumulativeLast() external view returns (uint256);
+
+    function kLast() external view returns (uint256);
+
+    function mint(address to) external returns (uint256 liquidity);
+
+    function burn(
+        address to
+    ) external returns (uint256 amount0, uint256 amount1);
+
+    function swap(
+        uint256 amount0Out,
+        uint256 amount1Out,
+        address to,
+        bytes calldata data
+    ) external;
+
+    function skim(address to) external;
+
+    function sync() external;
+
+    function initialize(address, address) external;
 }
-
 
 interface IUniswapV2Factory {
-  event PairCreated(
-    address indexed token0,
-    address indexed token1,
-    address pair,
-    uint256
-  );
+    event PairCreated(
+        address indexed token0,
+        address indexed token1,
+        address pair,
+        uint256
+    );
 
-  function feeTo() external view returns (address);
+    function feeTo() external view returns (address);
 
-  function feeToSetter() external view returns (address);
+    function feeToSetter() external view returns (address);
 
-  function getPair(address tokenA, address tokenB)
-    external
-    view
-    returns (address pair);
+    function getPair(
+        address tokenA,
+        address tokenB
+    ) external view returns (address pair);
 
-  function allPairs(uint256) external view returns (address pair);
+    function allPairs(uint256) external view returns (address pair);
 
-  function allPairsLength() external view returns (uint256);
+    function allPairsLength() external view returns (uint256);
 
-  function createPair(address tokenA, address tokenB)
-    external
-    returns (address pair);
+    function createPair(
+        address tokenA,
+        address tokenB
+    ) external returns (address pair);
 
-  function setFeeTo(address) external;
+    function setFeeTo(address) external;
 
-  function setFeeToSetter(address) external;
+    function setFeeToSetter(address) external;
 }
-
 
 library FullMath {
-  /// @notice Calculates floor(a×b÷denominator) with full precision. Throws if result overflows a uint256 or denominator == 0
-  /// @param a The multiplicand
-  /// @param b The multiplier
-  /// @param denominator The divisor
-  /// @return result The 256-bit result
-  /// @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
-  function mulDiv(
-    uint256 a,
-    uint256 b,
-    uint256 denominator
-  ) internal pure returns (uint256 result) {
-    // 512-bit multiply [prod1 prod0] = a * b
-    // Compute the product mod 2**256 and mod 2**256 - 1
-    // then use the Chinese Remainder Theorem to reconstruct
-    // the 512 bit result. The result is stored in two 256
-    // variables such that product = prod1 * 2**256 + prod0
-    uint256 prod0; // Least significant 256 bits of the product
-    uint256 prod1; // Most significant 256 bits of the product
-    assembly {
-      let mm := mulmod(a, b, not(0))
-      prod0 := mul(a, b)
-      prod1 := sub(sub(mm, prod0), lt(mm, prod0))
+    /// @notice Calculates floor(a×b÷denominator) with full precision. Throws if result overflows a uint256 or denominator == 0
+    /// @param a The multiplicand
+    /// @param b The multiplier
+    /// @param denominator The divisor
+    /// @return result The 256-bit result
+    /// @dev Credit to Remco Bloemen under MIT license https://xn--2-umb.com/21/muldiv
+    function mulDiv(
+        uint256 a,
+        uint256 b,
+        uint256 denominator
+    ) internal pure returns (uint256 result) {
+        // 512-bit multiply [prod1 prod0] = a * b
+        // Compute the product mod 2**256 and mod 2**256 - 1
+        // then use the Chinese Remainder Theorem to reconstruct
+        // the 512 bit result. The result is stored in two 256
+        // variables such that product = prod1 * 2**256 + prod0
+        uint256 prod0; // Least significant 256 bits of the product
+        uint256 prod1; // Most significant 256 bits of the product
+        assembly {
+            let mm := mulmod(a, b, not(0))
+            prod0 := mul(a, b)
+            prod1 := sub(sub(mm, prod0), lt(mm, prod0))
+        }
+
+        // Handle non-overflow cases, 256 by 256 division
+        if (prod1 == 0) {
+            require(denominator > 0);
+            assembly {
+                result := div(prod0, denominator)
+            }
+            return result;
+        }
+
+        // Make sure the result is less than 2**256.
+        // Also prevents denominator == 0
+        require(denominator > prod1);
+
+        ///////////////////////////////////////////////
+        // 512 by 256 division.
+        ///////////////////////////////////////////////
+
+        // Make division exact by subtracting the remainder from [prod1 prod0]
+        // Compute remainder using mulmod
+        uint256 remainder;
+        assembly {
+            remainder := mulmod(a, b, denominator)
+        }
+        // Subtract 256 bit number from 512 bit number
+        assembly {
+            prod1 := sub(prod1, gt(remainder, prod0))
+            prod0 := sub(prod0, remainder)
+        }
+
+        // Factor powers of two out of denominator
+        // Compute largest power of two divisor of denominator.
+        // Always >= 1.
+        unchecked {
+            uint256 twos = (type(uint256).max - denominator + 1) & denominator;
+            // Divide denominator by power of two
+            assembly {
+                denominator := div(denominator, twos)
+            }
+
+            // Divide [prod1 prod0] by the factors of two
+            assembly {
+                prod0 := div(prod0, twos)
+            }
+            // Shift in bits from prod1 into prod0. For this we need
+            // to flip `twos` such that it is 2**256 / twos.
+            // If twos is zero, then it becomes one
+            assembly {
+                twos := add(div(sub(0, twos), twos), 1)
+            }
+            prod0 |= prod1 * twos;
+
+            // Invert denominator mod 2**256
+            // Now that denominator is an odd number, it has an inverse
+            // modulo 2**256 such that denominator * inv = 1 mod 2**256.
+            // Compute the inverse by starting with a seed that is correct
+            // correct for four bits. That is, denominator * inv = 1 mod 2**4
+            uint256 inv = (3 * denominator) ^ 2;
+            // Now use Newton-Raphson iteration to improve the precision.
+            // Thanks to Hensel's lifting lemma, this also works in modular
+            // arithmetic, doubling the correct bits in each step.
+            inv *= 2 - denominator * inv; // inverse mod 2**8
+            inv *= 2 - denominator * inv; // inverse mod 2**16
+            inv *= 2 - denominator * inv; // inverse mod 2**32
+            inv *= 2 - denominator * inv; // inverse mod 2**64
+            inv *= 2 - denominator * inv; // inverse mod 2**128
+            inv *= 2 - denominator * inv; // inverse mod 2**256
+
+            // Because the division is now exact we can divide by multiplying
+            // with the modular inverse of denominator. This will give us the
+            // correct result modulo 2**256. Since the precoditions guarantee
+            // that the outcome is less than 2**256, this is the final result.
+            // We don't need to compute the high bits of the result and prod1
+            // is no longer required.
+            result = prod0 * inv;
+            return result;
+        }
     }
-
-    // Handle non-overflow cases, 256 by 256 division
-    if (prod1 == 0) {
-      require(denominator > 0);
-      assembly {
-        result := div(prod0, denominator)
-      }
-      return result;
-    }
-
-    // Make sure the result is less than 2**256.
-    // Also prevents denominator == 0
-    require(denominator > prod1);
-
-    ///////////////////////////////////////////////
-    // 512 by 256 division.
-    ///////////////////////////////////////////////
-
-    // Make division exact by subtracting the remainder from [prod1 prod0]
-    // Compute remainder using mulmod
-    uint256 remainder;
-    assembly {
-      remainder := mulmod(a, b, denominator)
-    }
-    // Subtract 256 bit number from 512 bit number
-    assembly {
-      prod1 := sub(prod1, gt(remainder, prod0))
-      prod0 := sub(prod0, remainder)
-    }
-
-    // Factor powers of two out of denominator
-    // Compute largest power of two divisor of denominator.
-    // Always >= 1.
-    unchecked {
-      uint256 twos = (type(uint256).max - denominator + 1) & denominator;
-      // Divide denominator by power of two
-      assembly {
-        denominator := div(denominator, twos)
-      }
-
-      // Divide [prod1 prod0] by the factors of two
-      assembly {
-        prod0 := div(prod0, twos)
-      }
-      // Shift in bits from prod1 into prod0. For this we need
-      // to flip `twos` such that it is 2**256 / twos.
-      // If twos is zero, then it becomes one
-      assembly {
-        twos := add(div(sub(0, twos), twos), 1)
-      }
-      prod0 |= prod1 * twos;
-
-      // Invert denominator mod 2**256
-      // Now that denominator is an odd number, it has an inverse
-      // modulo 2**256 such that denominator * inv = 1 mod 2**256.
-      // Compute the inverse by starting with a seed that is correct
-      // correct for four bits. That is, denominator * inv = 1 mod 2**4
-      uint256 inv = (3 * denominator) ^ 2;
-      // Now use Newton-Raphson iteration to improve the precision.
-      // Thanks to Hensel's lifting lemma, this also works in modular
-      // arithmetic, doubling the correct bits in each step.
-      inv *= 2 - denominator * inv; // inverse mod 2**8
-      inv *= 2 - denominator * inv; // inverse mod 2**16
-      inv *= 2 - denominator * inv; // inverse mod 2**32
-      inv *= 2 - denominator * inv; // inverse mod 2**64
-      inv *= 2 - denominator * inv; // inverse mod 2**128
-      inv *= 2 - denominator * inv; // inverse mod 2**256
-
-      // Because the division is now exact we can divide by multiplying
-      // with the modular inverse of denominator. This will give us the
-      // correct result modulo 2**256. Since the precoditions guarantee
-      // that the outcome is less than 2**256, this is the final result.
-      // We don't need to compute the high bits of the result and prod1
-      // is no longer required.
-      result = prod0 * inv;
-      return result;
-    }
-  }
 }
 
-
-contract NovaLocker is INovaLock , Ownable {
+contract TokenLocker is I0xLaunchLock, Ownable {
     using Address for address payable;
     using EnumerableSet for EnumerableSet.AddressSet;
     using EnumerableSet for EnumerableSet.UintSet;
@@ -1295,7 +1405,7 @@ contract NovaLocker is INovaLock , Ownable {
         uint256 amount;
     }
 
-    // ID padding from NovaLock v1, as there is a lack of a pausing mechanism
+    // ID padding from 0xLaunchLock v1, as there is a lack of a pausing mechanism
     // as of now the lastest id from v1 is about 22K, so this is probably a safe padding value.
     uint256 private constant ID_PADDING = 1_000_000;
 
@@ -1495,11 +1605,9 @@ contract NovaLocker is INovaLock , Ownable {
         return ids;
     }
 
-    function _sumAmount(uint256[] calldata amounts)
-        internal
-        pure
-        returns (uint256)
-    {
+    function _sumAmount(
+        uint256[] calldata amounts
+    ) internal pure returns (uint256) {
         uint256 sum = 0;
         for (uint256 i = 0; i < amounts.length; i++) {
             if (amounts[i] == 0) {
@@ -1762,20 +1870,16 @@ contract NovaLocker is INovaLock , Ownable {
         );
     }
 
-    function withdrawableTokens(uint256 lockId)
-        external
-        view
-        returns (uint256)
-    {
+    function withdrawableTokens(
+        uint256 lockId
+    ) external view returns (uint256) {
         Lock memory userLock = getLockById(lockId);
         return _withdrawableTokens(userLock);
     }
 
-    function _withdrawableTokens(Lock memory userLock)
-        internal
-        view
-        returns (uint256)
-    {
+    function _withdrawableTokens(
+        Lock memory userLock
+    ) internal view returns (uint256) {
         if (userLock.amount == 0) return 0;
         if (userLock.unlockedAmount >= userLock.amount) return 0;
         if (block.timestamp < userLock.tgeDate) return 0;
@@ -1860,10 +1964,10 @@ contract NovaLocker is INovaLock , Ownable {
         );
     }
 
-    function editLockDescription(uint256 lockId, string memory description)
-        external
-        validLock(lockId)
-    {
+    function editLockDescription(
+        uint256 lockId,
+        string memory description
+    ) external validLock(lockId) {
         Lock storage userLock = _locks[_getActualIndex(lockId)];
         require(
             userLock.owner == msg.sender,
@@ -1873,10 +1977,10 @@ contract NovaLocker is INovaLock , Ownable {
         emit LockDescriptionChanged(lockId);
     }
 
-    function transferLockOwnership(uint256 lockId, address newOwner)
-        public
-        validLock(lockId)
-    {
+    function transferLockOwnership(
+        uint256 lockId,
+        address newOwner
+    ) public validLock(lockId) {
         Lock storage userLock = _locks[_getActualIndex(lockId)];
         address currentOwner = userLock.owner;
         require(
@@ -1943,27 +2047,22 @@ contract NovaLocker is INovaLock , Ownable {
         return _normalLockedTokens.length();
     }
 
-    function getCumulativeLpTokenLockInfoAt(uint256 index)
-        external
-        view
-        returns (CumulativeLockInfo memory)
-    {
+    function getCumulativeLpTokenLockInfoAt(
+        uint256 index
+    ) external view returns (CumulativeLockInfo memory) {
         return cumulativeLockInfo[_lpLockedTokens.at(index)];
     }
 
-    function getCumulativeNormalTokenLockInfoAt(uint256 index)
-        external
-        view
-        returns (CumulativeLockInfo memory)
-    {
+    function getCumulativeNormalTokenLockInfoAt(
+        uint256 index
+    ) external view returns (CumulativeLockInfo memory) {
         return cumulativeLockInfo[_normalLockedTokens.at(index)];
     }
 
-    function getCumulativeLpTokenLockInfo(uint256 start, uint256 end)
-        external
-        view
-        returns (CumulativeLockInfo[] memory)
-    {
+    function getCumulativeLpTokenLockInfo(
+        uint256 start,
+        uint256 end
+    ) external view returns (CumulativeLockInfo[] memory) {
         if (end >= _lpLockedTokens.length()) {
             end = _lpLockedTokens.length() - 1;
         }
@@ -1977,11 +2076,10 @@ contract NovaLocker is INovaLock , Ownable {
         return lockInfo;
     }
 
-    function getCumulativeNormalTokenLockInfo(uint256 start, uint256 end)
-        external
-        view
-        returns (CumulativeLockInfo[] memory)
-    {
+    function getCumulativeNormalTokenLockInfo(
+        uint256 start,
+        uint256 end
+    ) external view returns (CumulativeLockInfo[] memory) {
         if (end >= _normalLockedTokens.length()) {
             end = _normalLockedTokens.length() - 1;
         }
@@ -2005,11 +2103,9 @@ contract NovaLocker is INovaLock , Ownable {
         return _userLpLockIds[user].length();
     }
 
-    function lpLocksForUser(address user)
-        external
-        view
-        returns (Lock[] memory)
-    {
+    function lpLocksForUser(
+        address user
+    ) external view returns (Lock[] memory) {
         uint256 length = _userLpLockIds[user].length();
         Lock[] memory userLocks = new Lock[](length);
         for (uint256 i = 0; i < length; i++) {
@@ -2018,28 +2114,23 @@ contract NovaLocker is INovaLock , Ownable {
         return userLocks;
     }
 
-    function lpLockForUserAtIndex(address user, uint256 index)
-        external
-        view
-        returns (Lock memory)
-    {
+    function lpLockForUserAtIndex(
+        address user,
+        uint256 index
+    ) external view returns (Lock memory) {
         require(lpLockCountForUser(user) > index, "Invalid index");
         return getLockById(_userLpLockIds[user].at(index));
     }
 
-    function normalLockCountForUser(address user)
-        public
-        view
-        returns (uint256)
-    {
+    function normalLockCountForUser(
+        address user
+    ) public view returns (uint256) {
         return _userNormalLockIds[user].length();
     }
 
-    function normalLocksForUser(address user)
-        external
-        view
-        returns (Lock[] memory)
-    {
+    function normalLocksForUser(
+        address user
+    ) external view returns (Lock[] memory) {
         uint256 length = _userNormalLockIds[user].length();
         Lock[] memory userLocks = new Lock[](length);
 
@@ -2049,28 +2140,23 @@ contract NovaLocker is INovaLock , Ownable {
         return userLocks;
     }
 
-    function normalLockForUserAtIndex(address user, uint256 index)
-        external
-        view
-        returns (Lock memory)
-    {
+    function normalLockForUserAtIndex(
+        address user,
+        uint256 index
+    ) external view returns (Lock memory) {
         require(normalLockCountForUser(user) > index, "Invalid index");
         return getLockById(_userNormalLockIds[user].at(index));
     }
 
-    function totalLockCountForUser(address user)
-        external
-        view
-        returns (uint256)
-    {
+    function totalLockCountForUser(
+        address user
+    ) external view returns (uint256) {
         return normalLockCountForUser(user) + lpLockCountForUser(user);
     }
 
-    function totalLockCountForToken(address token)
-        external
-        view
-        returns (uint256)
-    {
+    function totalLockCountForToken(
+        address token
+    ) external view returns (uint256) {
         return _tokenToLockIds[token].length();
     }
 
@@ -2101,11 +2187,9 @@ contract NovaLocker is INovaLock , Ownable {
         return actualIndex;
     }
 
-    function _parseFactoryAddress(address token)
-        internal
-        view
-        returns (address)
-    {
+    function _parseFactoryAddress(
+        address token
+    ) internal view returns (address) {
         address possibleFactoryAddress;
         try IUniswapV2Pair(token).factory() returns (address factory) {
             possibleFactoryAddress = factory;
@@ -2120,11 +2204,10 @@ contract NovaLocker is INovaLock , Ownable {
         return possibleFactoryAddress;
     }
 
-    function _isValidLpToken(address token, address factory)
-        private
-        view
-        returns (bool)
-    {
+    function _isValidLpToken(
+        address token,
+        address factory
+    ) private view returns (bool) {
         IUniswapV2Pair pair = IUniswapV2Pair(token);
         address factoryPair = IUniswapV2Factory(factory).getPair(
             pair.token0(),
@@ -2133,10 +2216,10 @@ contract NovaLocker is INovaLock , Ownable {
         return factoryPair == token;
     }
 
-    function WithdrawETH(address payable _reciever, uint256 _amount)
-        public
-        onlyOwner
-    {
+    function WithdrawETH(
+        address payable _reciever,
+        uint256 _amount
+    ) public onlyOwner {
         _reciever.transfer(_amount);
     }
 }

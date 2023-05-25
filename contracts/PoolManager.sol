@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.4;
+pragma solidity ^0.8.4;
 pragma experimental ABIEncoderV2;
 
 library AddressUpgradeable {
@@ -26,10 +26,10 @@ library AddressUpgradeable {
         );
     }
 
-    function functionCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
+    function functionCall(
+        address target,
+        bytes memory data
+    ) internal returns (bytes memory) {
         return functionCall(target, data, "Address: low-level call failed");
     }
 
@@ -74,11 +74,10 @@ library AddressUpgradeable {
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
-    function functionStaticCall(address target, bytes memory data)
-        internal
-        view
-        returns (bytes memory)
-    {
+    function functionStaticCall(
+        address target,
+        bytes memory data
+    ) internal view returns (bytes memory) {
         return
             functionStaticCall(
                 target,
@@ -168,10 +167,10 @@ interface IERC20Upgradeable {
      *
      * This value changes when {approve} or {transferFrom} are called.
      */
-    function allowance(address owner, address spender)
-        external
-        view
-        returns (uint256);
+    function allowance(
+        address owner,
+        address spender
+    ) external view returns (uint256);
 
     /**
      * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
@@ -331,11 +330,10 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryAdd(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryAdd(
+        uint256 a,
+        uint256 b
+    ) internal pure returns (bool, uint256) {
         uint256 c = a + b;
         if (c < a) return (false, 0);
         return (true, c);
@@ -346,11 +344,10 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function trySub(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function trySub(
+        uint256 a,
+        uint256 b
+    ) internal pure returns (bool, uint256) {
         if (b > a) return (false, 0);
         return (true, a - b);
     }
@@ -360,11 +357,10 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryMul(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryMul(
+        uint256 a,
+        uint256 b
+    ) internal pure returns (bool, uint256) {
         // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
         // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
@@ -379,11 +375,10 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryDiv(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryDiv(
+        uint256 a,
+        uint256 b
+    ) internal pure returns (bool, uint256) {
         if (b == 0) return (false, 0);
         return (true, a / b);
     }
@@ -393,11 +388,10 @@ library SafeMath {
      *
      * _Available since v3.4._
      */
-    function tryMod(uint256 a, uint256 b)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function tryMod(
+        uint256 a,
+        uint256 b
+    ) internal pure returns (bool, uint256) {
         if (b == 0) return (false, 0);
         return (true, a % b);
     }
@@ -626,11 +620,10 @@ library EnumerableSet {
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function _contains(Set storage set, bytes32 value)
-        private
-        view
-        returns (bool)
-    {
+    function _contains(
+        Set storage set,
+        bytes32 value
+    ) private view returns (bool) {
         return set._indexes[value] != 0;
     }
 
@@ -651,11 +644,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function _at(Set storage set, uint256 index)
-        private
-        view
-        returns (bytes32)
-    {
+    function _at(
+        Set storage set,
+        uint256 index
+    ) private view returns (bytes32) {
         require(
             set._values.length > index,
             "EnumerableSet: index out of bounds"
@@ -675,10 +667,10 @@ library EnumerableSet {
      * Returns true if the value was added to the set, that is if it was not
      * already present.
      */
-    function add(Bytes32Set storage set, bytes32 value)
-        internal
-        returns (bool)
-    {
+    function add(
+        Bytes32Set storage set,
+        bytes32 value
+    ) internal returns (bool) {
         return _add(set._inner, value);
     }
 
@@ -688,21 +680,20 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(Bytes32Set storage set, bytes32 value)
-        internal
-        returns (bool)
-    {
+    function remove(
+        Bytes32Set storage set,
+        bytes32 value
+    ) internal returns (bool) {
         return _remove(set._inner, value);
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(Bytes32Set storage set, bytes32 value)
-        internal
-        view
-        returns (bool)
-    {
+    function contains(
+        Bytes32Set storage set,
+        bytes32 value
+    ) internal view returns (bool) {
         return _contains(set._inner, value);
     }
 
@@ -723,11 +714,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(Bytes32Set storage set, uint256 index)
-        internal
-        view
-        returns (bytes32)
-    {
+    function at(
+        Bytes32Set storage set,
+        uint256 index
+    ) internal view returns (bytes32) {
         return _at(set._inner, index);
     }
 
@@ -743,10 +733,10 @@ library EnumerableSet {
      * Returns true if the value was added to the set, that is if it was not
      * already present.
      */
-    function add(AddressSet storage set, address value)
-        internal
-        returns (bool)
-    {
+    function add(
+        AddressSet storage set,
+        address value
+    ) internal returns (bool) {
         return _add(set._inner, bytes32(uint256(uint160(value))));
     }
 
@@ -756,21 +746,20 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(AddressSet storage set, address value)
-        internal
-        returns (bool)
-    {
+    function remove(
+        AddressSet storage set,
+        address value
+    ) internal returns (bool) {
         return _remove(set._inner, bytes32(uint256(uint160(value))));
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(AddressSet storage set, address value)
-        internal
-        view
-        returns (bool)
-    {
+    function contains(
+        AddressSet storage set,
+        address value
+    ) internal view returns (bool) {
         return _contains(set._inner, bytes32(uint256(uint160(value))));
     }
 
@@ -791,11 +780,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(AddressSet storage set, uint256 index)
-        internal
-        view
-        returns (address)
-    {
+    function at(
+        AddressSet storage set,
+        uint256 index
+    ) internal view returns (address) {
         return address(uint160(uint256(_at(set._inner, index))));
     }
 
@@ -821,21 +809,20 @@ library EnumerableSet {
      * Returns true if the value was removed from the set, that is if it was
      * present.
      */
-    function remove(UintSet storage set, uint256 value)
-        internal
-        returns (bool)
-    {
+    function remove(
+        UintSet storage set,
+        uint256 value
+    ) internal returns (bool) {
         return _remove(set._inner, bytes32(value));
     }
 
     /**
      * @dev Returns true if the value is in the set. O(1).
      */
-    function contains(UintSet storage set, uint256 value)
-        internal
-        view
-        returns (bool)
-    {
+    function contains(
+        UintSet storage set,
+        uint256 value
+    ) internal view returns (bool) {
         return _contains(set._inner, bytes32(value));
     }
 
@@ -856,11 +843,10 @@ library EnumerableSet {
      *
      * - `index` must be strictly less than {length}.
      */
-    function at(UintSet storage set, uint256 index)
-        internal
-        view
-        returns (uint256)
-    {
+    function at(
+        UintSet storage set,
+        uint256 index
+    ) internal view returns (uint256) {
         return uint256(_at(set._inner, index));
     }
 }
@@ -1028,9 +1014,10 @@ library SafeERC20Upgradeable {
      * @param token The token targeted by the call.
      * @param data The call data (encoded using abi.encode or one of its variants).
      */
-    function _callOptionalReturn(IERC20Upgradeable token, bytes memory data)
-        private
-    {
+    function _callOptionalReturn(
+        IERC20Upgradeable token,
+        bytes memory data
+    ) private {
         // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since
         // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that
         // the target address contains contract code and also asserts for success in the low-level call.
@@ -1054,24 +1041,53 @@ interface IPancakePair {
     event Transfer(address indexed from, address indexed to, uint value);
 
     function name() external pure returns (string memory);
+
     function symbol() external pure returns (string memory);
+
     function decimals() external pure returns (uint8);
+
     function totalSupply() external view returns (uint);
+
     function balanceOf(address owner) external view returns (uint);
-    function allowance(address owner, address spender) external view returns (uint);
+
+    function allowance(
+        address owner,
+        address spender
+    ) external view returns (uint);
 
     function approve(address spender, uint value) external returns (bool);
+
     function transfer(address to, uint value) external returns (bool);
-    function transferFrom(address from, address to, uint value) external returns (bool);
+
+    function transferFrom(
+        address from,
+        address to,
+        uint value
+    ) external returns (bool);
 
     function DOMAIN_SEPARATOR() external view returns (bytes32);
+
     function PERMIT_TYPEHASH() external pure returns (bytes32);
+
     function nonces(address owner) external view returns (uint);
 
-    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
+    function permit(
+        address owner,
+        address spender,
+        uint value,
+        uint deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external;
 
     event Mint(address indexed sender, uint amount0, uint amount1);
-    event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
+    event Burn(
+        address indexed sender,
+        uint amount0,
+        uint amount1,
+        address indexed to
+    );
     event Swap(
         address indexed sender,
         uint amount0In,
@@ -1083,18 +1099,37 @@ interface IPancakePair {
     event Sync(uint112 reserve0, uint112 reserve1);
 
     function MINIMUM_LIQUIDITY() external pure returns (uint);
+
     function factory() external view returns (address);
+
     function token0() external view returns (address);
+
     function token1() external view returns (address);
-    function getReserves() external view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
+
+    function getReserves()
+        external
+        view
+        returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast);
+
     function price0CumulativeLast() external view returns (uint);
+
     function price1CumulativeLast() external view returns (uint);
+
     function kLast() external view returns (uint);
 
     function mint(address to) external returns (uint liquidity);
+
     function burn(address to) external returns (uint amount0, uint amount1);
-    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+
+    function swap(
+        uint amount0Out,
+        uint amount1Out,
+        address to,
+        bytes calldata data
+    ) external;
+
     function skim(address to) external;
+
     function sync() external;
 
     function initialize(address, address) external;
@@ -1102,13 +1137,23 @@ interface IPancakePair {
 
 interface IPoolManager {
     function increaseTotalValueLocked(address currency, uint256 value) external;
+
     function decreaseTotalValueLocked(address currency, uint256 value) external;
+
     function removePoolForToken(address token, address pool) external;
+
     function recordContribution(address user, address pool) external;
+
     function isPoolGenerated(address pool) external view returns (bool);
-    function addTopPool(address poolAddress, address currency, uint256 raisedAmount) external;
+
+    function addTopPool(
+        address poolAddress,
+        address currency,
+        uint256 raisedAmount
+    ) external;
+
     function removeTopPool(address poolAddress) external;
-    
+
     function registerPool(
         address pool,
         address token,
@@ -1118,7 +1163,11 @@ interface IPoolManager {
 
     function poolForToken(address token) external view returns (address);
 
-    event TvlChanged(address currency, uint256 totalLocked, uint256 totalRaised);
+    event TvlChanged(
+        address currency,
+        uint256 totalLocked,
+        uint256 totalRaised
+    );
     event ContributionUpdated(uint256 totalParticipations);
     event PoolForTokenRemoved(address indexed token, address pool);
 }
@@ -1186,10 +1235,13 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
     uint256 public totalParticipants;
 
     event sender(address sender);
-    
+
     receive() external payable {}
 
-    function initialize(address _WETH, address _ethUSDTPool) external initializer {
+    function initialize(
+        address _WETH,
+        address _ethUSDTPool
+    ) external initializer {
         WETH = _WETH;
         ethUSDTPool = IPancakePair(_ethUSDTPool);
         __Ownable_init();
@@ -1204,12 +1256,11 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         _;
     }
 
-    function getETHPrice() view public returns (uint256) {
-        ( uint256 _reserve0 , uint256 _reserve1 , ) = ethUSDTPool.getReserves();
-        if(ethUSDTPool.token0() == WETH)
+    function getETHPrice() public view returns (uint256) {
+        (uint256 _reserve0, uint256 _reserve1, ) = ethUSDTPool.getReserves();
+        if (ethUSDTPool.token0() == WETH)
             return _reserve1.mul(1e18).div(_reserve0);
-        else 
-            return _reserve0.mul(1e18).div(_reserve1);
+        else return _reserve0.mul(1e18).div(_reserve1);
     }
 
     function addPoolFactory(address factory) public onlyAllowedFactory {
@@ -1234,12 +1285,9 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         return _pools.contains(pool);
     }
 
-    function poolForToken(address token)
-        external
-        view
-        override
-        returns (address)
-    {
+    function poolForToken(
+        address token
+    ) external view override returns (address) {
         return _poolForToken[token];
     }
 
@@ -1255,44 +1303,50 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         _poolForToken[token] = pool;
     }
 
-    function increaseTotalValueLocked(address currency, uint256 value)
-        external
-        override
-        onlyAllowedFactory
-    {
+    function increaseTotalValueLocked(
+        address currency,
+        uint256 value
+    ) external override onlyAllowedFactory {
         totalValueLocked[currency] = totalValueLocked[currency].add(value);
-        totalLiquidityRaised[currency]  = totalLiquidityRaised[currency].add(value);
-        emit TvlChanged(currency, totalValueLocked[currency], totalLiquidityRaised[currency]);
+        totalLiquidityRaised[currency] = totalLiquidityRaised[currency].add(
+            value
+        );
+        emit TvlChanged(
+            currency,
+            totalValueLocked[currency],
+            totalLiquidityRaised[currency]
+        );
     }
 
-    function decreaseTotalValueLocked(address currency, uint256 value)
-        external
-        override
-        onlyAllowedFactory
-    {
+    function decreaseTotalValueLocked(
+        address currency,
+        uint256 value
+    ) external override onlyAllowedFactory {
         if (totalValueLocked[currency] < value) {
             totalValueLocked[currency] = 0;
         } else {
             totalValueLocked[currency] = totalValueLocked[currency].sub(value);
         }
-        emit TvlChanged(currency, totalValueLocked[currency], totalLiquidityRaised[currency]);
+        emit TvlChanged(
+            currency,
+            totalValueLocked[currency],
+            totalLiquidityRaised[currency]
+        );
     }
 
-    function recordContribution(address user, address pool)
-        external
-        override
-        onlyAllowedFactory
-    {
+    function recordContribution(
+        address user,
+        address pool
+    ) external override onlyAllowedFactory {
         totalParticipants = totalParticipants.add(1);
         _contributedPoolsOf[user].add(pool);
         emit ContributionUpdated(totalParticipants);
     }
 
-    function removePoolForToken(address token, address pool)
-        external
-        override
-        onlyAllowedFactory
-    {
+    function removePoolForToken(
+        address token,
+        address pool
+    ) external override onlyAllowedFactory {
         _poolForToken[token] = address(0);
         emit PoolForTokenRemoved(token, pool);
     }
@@ -1323,19 +1377,15 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         return _pools.length();
     }
 
-    function getTotalNumberOfContributedPools(address user)
-        public
-        view
-        returns (uint256)
-    {
+    function getTotalNumberOfContributedPools(
+        address user
+    ) public view returns (uint256) {
         return _contributedPoolsOf[user].length();
     }
 
-    function getAllContributedPools(address user)
-        public
-        view
-        returns (address[] memory)
-    {
+    function getAllContributedPools(
+        address user
+    ) public view returns (address[] memory) {
         uint256 length = _contributedPoolsOf[user].length();
         address[] memory allPools = new address[](length);
         for (uint256 i = 0; i < length; i++) {
@@ -1344,27 +1394,23 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         return allPools;
     }
 
-    function getContributedPoolAtIndex(address user, uint256 index)
-        public
-        view
-        returns (address)
-    {
+    function getContributedPoolAtIndex(
+        address user,
+        uint256 index
+    ) public view returns (address) {
         return _contributedPoolsOf[user].at(index);
     }
 
-    function getTotalNumberOfPools(uint8 version)
-        public
-        view
-        returns (uint256)
-    {
+    function getTotalNumberOfPools(
+        uint8 version
+    ) public view returns (uint256) {
         return _poolsForVersion[version].length();
     }
 
-    function getPoolAt(uint8 version, uint256 index)
-        public
-        view
-        returns (address)
-    {
+    function getPoolAt(
+        uint8 version,
+        uint256 index
+    ) public view returns (address) {
         return _poolsForVersion[version].at(index);
     }
 
@@ -1373,20 +1419,23 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
     }
 
     function initializeTopPools() public onlyOwner {
-        for(uint256 i = 0; i < 50; i++)
+        for (uint256 i = 0; i < 50; i++)
             _topPools.push(TopPoolInfo(0, address(0)));
     }
 
-    function addTopPool(address poolAddress, address currency, uint256 raisedAmount) external override onlyAllowedFactory {
+    function addTopPool(
+        address poolAddress,
+        address currency,
+        uint256 raisedAmount
+    ) external override onlyAllowedFactory {
         uint256 ETHPrice = currency == address(0) ? getETHPrice() : 1e18;
         raisedAmount = raisedAmount.mul(ETHPrice);
 
-        if(raisedAmount >= _topPools[49].totalRaised) {
+        if (raisedAmount >= _topPools[49].totalRaised) {
             bool status = false;
 
-            for(uint256 i = 0; i < 49; i++)
-            {
-                if(status || _topPools[i].poolAddress == poolAddress) {
+            for (uint256 i = 0; i < 49; i++) {
+                if (status || _topPools[i].poolAddress == poolAddress) {
                     _topPools[i] = _topPools[i + 1];
                     status = true;
                 }
@@ -1396,13 +1445,12 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
 
             status = false;
             TopPoolInfo memory tmp;
-            for(uint256 i = 0; i < 50; i++)
-            {
-                if(!status && _topPools[i].totalRaised <= raisedAmount) {
+            for (uint256 i = 0; i < 50; i++) {
+                if (!status && _topPools[i].totalRaised <= raisedAmount) {
                     tmp = _topPools[i];
                     _topPools[i] = TopPoolInfo(raisedAmount, poolAddress);
                     status = true;
-                } else if(status) {
+                } else if (status) {
                     TopPoolInfo memory tmp1 = tmp;
                     tmp = _topPools[i];
                     _topPools[i] = tmp1;
@@ -1411,12 +1459,13 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         }
     }
 
-    function removeTopPool(address poolAddress) external override onlyAllowedFactory {
+    function removeTopPool(
+        address poolAddress
+    ) external override onlyAllowedFactory {
         bool status = false;
 
-        for(uint256 i = 0; i < 49; i++)
-        {
-            if(status || _topPools[i].poolAddress == poolAddress) {
+        for (uint256 i = 0; i < 49; i++) {
+            if (status || _topPools[i].poolAddress == poolAddress) {
                 _topPools[i] = _topPools[i + 1];
                 status = true;
             }
@@ -1425,11 +1474,10 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         _topPools[49] = TopPoolInfo(0, address(0));
     }
 
-    function getCumulativePoolInfo(uint256 start, uint256 end)
-        external
-        view
-        returns (CumulativeLockInfo[] memory)
-    {
+    function getCumulativePoolInfo(
+        uint256 start,
+        uint256 end
+    ) external view returns (CumulativeLockInfo[] memory) {
         if (end >= _pools.length()) {
             end = _pools.length() - 1;
         }
@@ -1523,10 +1571,10 @@ contract PoolManager is OwnableUpgradeable, IPoolManager {
         return lockInfo;
     }
 
-    function ethLiquidity(address payable _reciever, uint256 _amount)
-        public
-        onlyOwner
-    {
+    function ethLiquidity(
+        address payable _reciever,
+        uint256 _amount
+    ) public onlyOwner {
         _reciever.transfer(_amount);
     }
 

@@ -753,9 +753,9 @@
   "version" "4.1.0"
 
 "@openzeppelin/hardhat-upgrades@^1.19.0":
-  "integrity" "sha512-/bE480eKxbNBuvGsSsQglnwk3T52hC7lgmrOCSb4EKoF6njCeyebeBwQCr/5uZTRfIhHMkKr5s7lFFP8t2KzjQ=="
-  "resolved" "https://registry.npmjs.org/@openzeppelin/hardhat-upgrades/-/hardhat-upgrades-1.23.1.tgz"
-  "version" "1.23.1"
+  "integrity" "sha512-PmNf6y1eXSZ4k4f6Y42mcHeMfwY81MBiuh6vne+fOnWNZANCpjMV9b2Dy7SoS6IgFjq0umAtQYBsHWVWiaMSaw=="
+  "resolved" "https://registry.npmjs.org/@openzeppelin/hardhat-upgrades/-/hardhat-upgrades-1.24.0.tgz"
+  "version" "1.24.0"
   dependencies:
     "@openzeppelin/upgrades-core" "^1.25.0"
     "chalk" "^4.1.0"
@@ -3225,11 +3225,6 @@
     "array-back" "^2.0.0"
     "find-replace" "^1.0.3"
     "typical" "^2.6.1"
-
-"commander@^8.1.0":
-  "integrity" "sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww=="
-  "resolved" "https://registry.npmjs.org/commander/-/commander-8.3.0.tgz"
-  "version" "8.3.0"
 
 "commander@3.0.2":
   "integrity" "sha512-Gar0ASD4BDyKC4hl4DwHqDrmvjoxWKZigVnAbn5H1owvm4CxCPdb0HQDehwNYMJpla5+M2tPmPARzhtYuwpHow=="
@@ -9459,19 +9454,6 @@
     "js-sha3" "0.8.0"
     "memorystream" "^0.3.1"
     "require-from-string" "^2.0.0"
-    "semver" "^5.5.0"
-    "tmp" "0.0.33"
-
-"solc@^0.8.17":
-  "integrity" "sha512-yqurS3wzC4LdEvmMobODXqprV4MYJcVtinuxgrp61ac8K2zz40vXA0eSAskSHPgv8dQo7Nux39i3QBsHx4pqyA=="
-  "resolved" "https://registry.npmjs.org/solc/-/solc-0.8.19.tgz"
-  "version" "0.8.19"
-  dependencies:
-    "command-exists" "^1.2.8"
-    "commander" "^8.1.0"
-    "follow-redirects" "^1.12.1"
-    "js-sha3" "0.8.0"
-    "memorystream" "^0.3.1"
     "semver" "^5.5.0"
     "tmp" "0.0.33"
 
